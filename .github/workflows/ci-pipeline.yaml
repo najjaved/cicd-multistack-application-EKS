@@ -1,0 +1,53 @@
+name: CI Pipeline
+# Builds Docker images for each microservice & pushes them to Docker Hub
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  workflow_dispatch: # allow manual triggering
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }} # use environment variables to pick between push events and tag push  events
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push image for vote service
+        uses: docker/build-push-action@v6
+        with:
+          context: "./multi-stack-application/vote"
+          push: true
+           # use environment variable env.IMAGE_TAG from deployment for image tag
+          tags: |
+              ${{ secrets.DOCKER_USERNAME }}/vote:${{ env.IMAGE_TAG }}
+              ${{ secrets.DOCKER_USERNAME }}/vote:latest
+
+      - name: Build and push image for result service
+        uses: docker/build-push-action@v6
+        with:
+          context: "./multi-stack-application/result"
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/result:${{ env.IMAGE_TAG }}
+            ${{ secrets.DOCKER_USERNAME }}/result:latest
+
+      - name: Build and push image for worker service
+        uses: docker/build-push-action@v6
+        with:
+          context: ".multi-stack-application/worker"
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/worker:${{ env.IMAGE_TAG }}
+            ${{ secrets.DOCKER_USERNAME }}/worker:latest
+      
