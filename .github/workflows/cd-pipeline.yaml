@@ -1,0 +1,73 @@
+---
+name: CD Pipeline
+# Provisions an EKS cluster and deploys (or updates) the Kubernetes manifests on EKS automatically.
+
+run-name: ${{ github.actor }} is Deploying 🚀
+on:
+  workflow_run:
+    workflows:
+      - CI Pipeline
+    types:
+      - completed
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+        # We need to:
+            # 1. install eksctl and kubectl
+            # 2. configure it with aws cli (aws eks)
+            # 3. deploy kubernetes manifest fr microservices
+
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+          
+        - name: Install eksctl & provision an EKS cluster
+          run: |
+            curl --silent --location "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+            sudo mv /tmp/eksctl /usr/local/bin
+            eksctl version
+            eksctl create cluster -f eks-cluster-config.yaml
+
+        - name: Install kubectl & update kubeconfig for EKS 
+          run: |
+            curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.32.0/2024-12-20/bin/linux/amd64/kubectl
+            chmod +x ./kubectl
+            mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
+            aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.AWS_CLUSTER }}
+
+        - name: Generate the final deployment templates
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y gettext-base
+
+        - name: Define image names for vote, result and worker service
+         # use environment variable env.IMAGE_TAG from deployment for image tag
+          run: |
+            export VOTE_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/vote:${{ env.IMAGE_TAG }}"
+            export RESULT_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/result:${{ env.IMAGE_TAG }}"
+            export WORKER_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/worker:${{ env.IMAGE_TAG }}"
+          #envsubst < deployment.template.yaml > deployment.yaml
+
+        - name: Replace placeholders in deployment templates
+          run: |  
+            envsubst < vote-deployment.yaml > deployment1.yaml
+            envsubst < result-deployment.yaml > deployment2.yaml
+            envsubst < worker-deployment.yaml > deployment3.yaml
+          #echo "Final vote deployment:"
+          #cat deployment1.yaml ...
+
+        - name: Deploy to EKS
+          run: |
+            env
+          # kubectl apply -f vote-deployment.yaml
+            # kubectl apply -f result-deployment.yaml
+            # kubectl apply -f worker-deployment.yaml
+            # kubectl apply -f redis-deployment.yaml
+            # kubectl apply -f postgres-deployment.yaml
+        

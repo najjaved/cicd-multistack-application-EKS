@@ -1,9 +1,10 @@
+---
 name: CI Pipeline
 # Builds Docker images for each microservice & pushes them to Docker Hub
 on:
   push:
     branches:
-      - main
+      - cicd
     tags:
       - '*'
   workflow_dispatch: # allow manual triggering
