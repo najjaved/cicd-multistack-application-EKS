@@ -46,22 +46,6 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y gettext-base
 
-        - name: Define image names for vote, result and worker service
-         # use environment variable env.IMAGE_TAG from deployment for image tag
-          run: |
-            export VOTE_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/vote:${{ env.IMAGE_TAG }}"
-            export RESULT_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/result:${{ env.IMAGE_TAG }}"
-            export WORKER_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/worker:${{ env.IMAGE_TAG }}"
-          #envsubst < deployment.template.yaml > deployment.yaml
-
-        - name: Replace placeholders in deployment templates
-          run: |  
-            envsubst < vote-deployment.yaml > deployment1.yaml
-            envsubst < result-deployment.yaml > deployment2.yaml
-            envsubst < worker-deployment.yaml > deployment3.yaml
-          #echo "Final vote deployment:"
-          #cat deployment1.yaml ...
-
         - name: Deploy to EKS
           run: |
             env

@@ -18,37 +18,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build and push image for vote service
-        uses: docker/build-push-action@v6
-        with:
-          context: "./multi-stack-application/vote"
-          push: true
-           # use environment variable env.IMAGE_TAG from deployment for image tag
-          tags: |
-              ${{ secrets.DOCKER_USERNAME }}/vote:${{ env.IMAGE_TAG }}
-              ${{ secrets.DOCKER_USERNAME }}/vote:latest
-
-      - name: Build and push image for result service
-        uses: docker/build-push-action@v6
-        with:
-          context: "./multi-stack-application/result"
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/result:${{ env.IMAGE_TAG }}
-            ${{ secrets.DOCKER_USERNAME }}/result:latest
-
-      - name: Build and push image for worker service
-        uses: docker/build-push-action@v6
-        with:
-          context: ".multi-stack-application/worker"
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/worker:${{ env.IMAGE_TAG }}
-            ${{ secrets.DOCKER_USERNAME }}/worker:latest
+      - name: Build Docker images
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/vote:latest ./multi-stack-application/vote
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/result:latest ./multi-stack-application/result
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/worker:latest ./multi-stack-application/worker
+      
+      - name: Push Docker images
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/vote:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/result:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/worker:latest
       
