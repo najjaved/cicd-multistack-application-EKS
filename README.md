@@ -151,35 +151,7 @@ We use the NGINX Ingress Controller to route external traffic into our cluster.
     
     ```
     
-## 6. Installing NGINX Ingress with Helm
-We use the NGINX Ingress Controller to route external traffic into our cluster.
-
-**Steps:**
-
-1. **Add the Ingress NGINX Helm repo:**
-    
-    ```bash
-    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-    helm repo update
-    
-    ```
-    
-2. **Install the Ingress Controller:**
-    
-    ```bash
-    helm install my-nginx ingress-nginx/ingress-nginx \
-      --namespace ingress-nginx --create-namespace
-    
-    ```
-    
-3. **Verify the installation:**
-    
-    ```bash
-    kubectl get pods -n ingress-nginx
-    
-    ```
-    
-## 7. Ingress Resource and Routing Explanations
+## 6. Ingress Resource and Routing Explanations
 In a Kubernetes Ingress, each **path** you specify defines how external requests are routed to the correct backend Service. Here's why this is important for our project:
 
 - **`/` and `/vote`:**
@@ -194,10 +166,10 @@ In a Kubernetes Ingress, each **path** you specify defines how external requests
     
     The Node.js result service manages the result page and its associated Socket.IO endpoint (e.g., `/result/socket.io`). Including this path guarantees that traffic for the results page is properly routed.
 
-## 8. Setting Up CI/CD with GitHub Actions
+## 7. Setting Up CI/CD with GitHub Actions
 Create `.github/workflows` folder and add continous integration and continous deployment workflows using YAML file(s).
 
-## 9. Verification
+## 8. Verification
 Once pipeline(s) runs successfully, confirm:
 
 - **All Deployments and Pods are running:**
@@ -222,7 +194,7 @@ Once pipeline(s) runs successfully, confirm:
 - **Test the flow:**
 Cast votes and observe them flowing from the vote app → Redis → worker → Postgres → result app.
 
-## 10. Conclusion
+## 9. Conclusion
 By following these steps, you'll have:
 
 - A secure and scalable **EKS Cluster** orchestrating your containers.

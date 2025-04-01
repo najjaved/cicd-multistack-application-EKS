@@ -5,7 +5,7 @@ kind: ClusterConfig
 
 metadata:
   name: multistack-eks-project
-  region: us-west-1
+  region: ca-west-1
 
 nodeGroups:
   - name: ng-project
