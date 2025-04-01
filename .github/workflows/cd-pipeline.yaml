@@ -44,7 +44,7 @@ jobs:
             sudo apt-get install -y gettext-base
 
         - name: Define image names for vote, result and worker service
-         # use environment variable env.IMAGE_TAG from corresponding deployments for image tag
+         # use environment variable env.IMAGE_TAG from corresponding deployments for creating image full name dynamically
           run: |
             echo "Image tag: ${{ env.IMAGE_TAG }}"
             export VOTE_IMAGE="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/voting-app-vote:${{ env.IMAGE_TAG }}"

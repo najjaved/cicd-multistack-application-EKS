@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: worker-container
-        image: najjaved/worker:${WORKER_IMAGE}
+        image: najjaved/worker
         ports:
           - containerPort: 80
         env:

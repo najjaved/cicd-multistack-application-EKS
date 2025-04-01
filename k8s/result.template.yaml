@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: result-container
-        image: najjaved/result:${RESULT_IMAGE}
+        image: najjaved/result
         ports:
           - containerPort: 80
         env:
