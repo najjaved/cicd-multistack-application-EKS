@@ -49,7 +49,7 @@ jobs:
             echo "Image tag: ${{ env.IMAGE_TAG }}"
             export VOTE_IMAGE="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/voting-app-vote:${{ env.IMAGE_TAG }}"
             export RESULT_IMAGE="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/voting-app-result:${{ env.IMAGE_TAG }}"
-            export WORKER_IMAGE="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/voting-app-worker:${{ env.IMAGE_TAG }}"
+            export WORKER_IMAGE="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/voting-app-worker:${{ env.IMAGE_TAG }}" 
           #envsubst < deployment.template.yaml > deployment.yaml
 
         - name: Replace placeholders in deployment templates
