@@ -51,9 +51,9 @@ jobs:
 
         - name: Replace placeholders in deployment templates
           run: |  
-            envsubst < k8s/vote.yaml > k8s/vote.yaml
-            envsubst < k8s/result.yaml > k8s/result.yaml
-            envsubst < k8s/worker.yaml > k8s/worker.yaml
+            envsubst < k8s/vote.template.yaml > k8s/vote.yaml
+            envsubst < k8s/result.template.yaml > k8s/result.yaml
+            envsubst < k8s/worker.template.yaml > k8s/worker.yaml
             echo "Final vote deployment:"
             cat k8s/vote.yaml
 
