@@ -51,11 +51,11 @@ jobs:
 
         - name: Replace placeholders in deployment templates
           run: |  
-            envsubst < vote-deployment.yaml > vote-deployment.yaml
-            envsubst < result-deployment.yaml > result-deployment.yaml
-            envsubst < worker-deployment.yaml > worker-deployment.yaml
+            envsubst < vote.yaml > vote.yaml
+            envsubst < result.yaml > result.yaml
+            envsubst < worker.yaml > worker.yaml
             echo "Final vote deployment:"
-            cat vote-deployment.yaml
+            cat vote.yaml
 
         - name: Deploy all manifests to EKS
           run: |
