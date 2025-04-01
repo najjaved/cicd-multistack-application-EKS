@@ -16,9 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         # We need to:
+            # 0. clone repository into the Github runner
             # 1. configure aws cli
             # 2. install kubectl
             # 3. deploy kubernetes manifests and ingress resource for the microservices
+        - name: Checkout repository
+          uses: actions/checkout@v4
 
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v4
