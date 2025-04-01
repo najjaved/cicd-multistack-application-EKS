@@ -29,3 +29,10 @@ spec:
                   name: vote-service
                   port:
                     number: 80
+          - path: /static
+            pathType: Prefix
+            backend:
+              service:
+                name: vote-service
+                port:
+                  number: 80
