@@ -41,23 +41,23 @@ jobs:
             sudo apt-get install -y gettext-base
 
         - name: Define image names for vote, result and worker service
-         # use environment variable env.IMAGE_TAG from deployment for image tag
+         # use environment variable env.IMAGE_TAG from corresponding deployments for image tag
           run: |
             echo "Image tag: ${{ env.IMAGE_TAG }}"
-            export VOTE_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/vote:${{ env.IMAGE_TAG }}"
-            export RESULT_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/result:${{ env.IMAGE_TAG }}"
-            export WORKER_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/worker:${{ env.IMAGE_TAG }}"
+            export VOTE_IMAGE="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/voting-app-vote:${{ env.IMAGE_TAG }}"
+            export RESULT_IMAGE="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/voting-app-result:${{ env.IMAGE_TAG }}"
+            export WORKER_IMAGE="docker.io/${{ secrets.DOCKERHUB_USERNAME }}/voting-app-worker:${{ env.IMAGE_TAG }}"
           #envsubst < deployment.template.yaml > deployment.yaml
 
         - name: Replace placeholders in deployment templates
           run: |  
-            envsubst < vote.yaml > vote.yaml
-            envsubst < result.yaml > result.yaml
-            envsubst < worker.yaml > worker.yaml
+            envsubst < k8s/vote.yaml > k8s/vote.yaml
+            envsubst < k8s/result.yaml > k8s/result.yaml
+            envsubst < k8s/worker.yaml > k8s/worker.yaml
             echo "Final vote deployment:"
-            cat vote.yaml
+            cat k8s/vote.yaml
 
         - name: Deploy all manifests to EKS
           run: |
-            kubectl apply -f ./k8s
+            kubectl apply -f k8s/
         
