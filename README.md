@@ -34,7 +34,7 @@ A quick way to create an EKS cluster is with `eksctl`. Example:
 
 ```bash
 eksctl create cluster \
-  --name voting-app-cluster \
+  --name multistack-eks-project \
   --region ca-west-1 \
   --nodegroup-name primary-nodes \
   --node-type t3.medium \
@@ -45,6 +45,12 @@ When the command finishes:
 
 - Check that your cluster is created: `eksctl get cluster`
 - Check `kubectl get nodes` to ensure you have ready worker nodes. (eksctl usually configures your `~/.kube/config` automatically.)
+- check if kubectl is pointing to the right cluster: ```kubectl config current-context``` </br>
+If not, run the following:
+```
+kubectl config get-contexts
+kubectl config use-context <your-eks-cluster-context>
+```
 
 ## 2. Creating & Managing Secrets
 You will likely have credentials (e.g., database passwords, Redis passwords if any). Store these as **Kubernetes Secrets** so they're not exposed in plaintext within your manifests.
