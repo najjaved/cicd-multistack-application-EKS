@@ -131,9 +131,13 @@ Switch to the "JSON" tab and paste the policy below:
 
 ```
 Verify the IAM policy update:
-``` aws iam list-attached-role-policies --role-name eksctl-multistack-eks-project-node-NodeInstanceRole-xVdRC5SUFqxt```
+```
+aws iam list-attached-role-policies --role-name eksctl-multistack-eks-project-node-NodeInstanceRole-xVdRC5SUFqxt
+```
 Restart ```ebs-csi-driver``` Pods to restart and pick up the new permissions:
-```kubectl delete pod -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver```
+```
+kubectl delete pod -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver
+```
 Now, you can use StorageClasses and PVCs.
 
 ## 4. Deploying the vote, result, and worker Microservices
