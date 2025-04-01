@@ -94,6 +94,48 @@ You can deploy Redis and Postgres in multiple ways:
 
 You can use a simple approach for Postgres, or opt for a **StatefulSet** if you need stable hostnames and volumes. (This is particularly important when data persistence is a priority.)
 
+### Steps to have StorageClasses and PVCs:
+1. Enable eksctl plugin to allow the cluster to use EBS:
+ ```eksctl create addon --name aws-ebs-csi-driver --cluster multistack-eks-project --region ca-west-1```
+2. Update IAM Permissions to create EBS volumes:
+- Log in to the AWS Management Console
+- Navigate to the IAM service -> roles
+- Find Your Node instance role:
+ Search for the role that your nodes use, it's something like eksctl-multistack-eks-project-node-NodeInstanceRole-xVdRC5SUFqxt.
+- Attach an Inline Policy:
+Click on the role and go to the "Permissions" tab.
+Choose "Add inline policy".
+Switch to the "JSON" tab and paste the policy below:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateVolume",
+                "ec2:DeleteVolume",
+                "ec2:AttachVolume",
+                "ec2:DetachVolume",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeVolumeStatus",
+                "ec2:DescribeInstances",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeSnapshots",
+                "ec2:CreateTags"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+
+```
+Verify the IAM policy update:
+``` aws iam list-attached-role-policies --role-name eksctl-multistack-eks-project-node-NodeInstanceRole-xVdRC5SUFqxt```
+Restart ```ebs-csi-driver``` Pods to restart and pick up the new permissions:
+```kubectl delete pod -n kube-system -l app.kubernetes.io/name=aws-ebs-csi-driver```
+Now, you can use StorageClasses and PVCs.
+
 ## 4. Deploying the vote, result, and worker Microservices
 Create separate Deployment and Service YAML files for each microservice.
 **Important:**
