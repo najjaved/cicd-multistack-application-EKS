@@ -43,6 +43,7 @@ jobs:
         - name: Define image names for vote, result and worker service
          # use environment variable env.IMAGE_TAG from deployment for image tag
           run: |
+            echo "Image tag: ${{ env.IMAGE_TAG }}"
             export VOTE_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/vote:${{ env.IMAGE_TAG }}"
             export RESULT_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/result:${{ env.IMAGE_TAG }}"
             export WORKER_IMAGE="docker.io/${{ secrets.DOCKER_USERNAME }}/multi-stack-application/worker:${{ env.IMAGE_TAG }}"

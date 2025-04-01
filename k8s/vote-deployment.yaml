@@ -19,7 +19,7 @@ spec:
           - containerPort: 80
         env:
           - name: REDIS_HOST
-            value: "redis-service" 
+            value: "redis-service" # Reference the service name
           - name: REDIS_PORT
             value: "6379"
 ---
