@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         # We need to:
-            # 1. install eksctl and kubectl
-            # 2. configure it with aws cli (aws eks)
-            # 3. deploy kubernetes manifest fr microservices
+            # 1. configure aws cli
+            # 2. install kubectl
+            # 3. deploy kubernetes manifests and ingress resource for the microservices
 
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v4
@@ -27,12 +27,6 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ secrets.AWS_REGION }}
           
-        - name: Install eksctl & provision an EKS cluster
-          run: |
-            curl --silent --location "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-            sudo mv /tmp/eksctl /usr/local/bin
-            eksctl version
-            eksctl create cluster -f eks-cluster-config.yaml
 
         - name: Install kubectl & update kubeconfig for EKS 
           run: |
@@ -56,18 +50,13 @@ jobs:
 
         - name: Replace placeholders in deployment templates
           run: |  
-            envsubst < vote-deployment.yaml > deployment1.yaml
-            envsubst < result-deployment.yaml > deployment2.yaml
-            envsubst < worker-deployment.yaml > deployment3.yaml
-          #echo "Final vote deployment:"
-          #cat deployment1.yaml ...
+            envsubst < vote-deployment.yaml > vote-deployment.yaml
+            envsubst < result-deployment.yaml > result-deployment.yaml
+            envsubst < worker-deployment.yaml > worker-deployment.yaml
+            echo "Final vote deployment:"
+            cat vote-deployment.yaml
 
-        - name: Deploy to EKS
+        - name: Deploy all manifests to EKS
           run: |
-            env
-          # kubectl apply -f vote-deployment.yaml
-            # kubectl apply -f result-deployment.yaml
-            # kubectl apply -f worker-deployment.yaml
-            # kubectl apply -f redis-deployment.yaml
-            # kubectl apply -f postgres-deployment.yaml
+            kubectl apply -f ./k8s
         

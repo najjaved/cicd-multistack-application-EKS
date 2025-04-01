@@ -53,9 +53,11 @@ Example:
 
 ```bash
 kubectl create secret generic db-credentials \
-  --from-literal=POSTGRES_USER=postgres \
-  --from-literal=POSTGRES_PASSWORD=someSecurePassword
+  --from-literal=postgres-username=postgres \
+  --from-literal=postgres-password=someSecurePassword
 
+```
+```kubectl get secrets```
 ```
 
 Then in your microservice Deployment manifests, you can reference them like this:
@@ -66,12 +68,12 @@ env:
     valueFrom:
       secretKeyRef:
         name: db-credentials
-        key: POSTGRES_USER
+        key: postgres-username
   - name: POSTGRES_PASSWORD
     valueFrom:
       secretKeyRef:
         name: db-credentials
-        key: POSTGRES_PASSWORD
+        key: postgres-password
 
 ```
 

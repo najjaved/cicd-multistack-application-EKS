@@ -1,6 +1,5 @@
 # to apply: eksctl create cluster -f eks-cluster-config.yaml
 
-
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
