@@ -23,14 +23,17 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/vote:${{ env.IMAGE_TAG }} ./multi-stack-application/vote
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/result:${{ env.IMAGE_TAG }} ./multi-stack-application/result
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/worker:${{ env.IMAGE_TAG }} ./multi-stack-application/worker
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/vote:${{ env.IMAGE_TAG }} -t ${{ secrets.DOCKERHUB_USERNAME }}/vote:latest ./multi-stack-application/vote
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/result:${{ env.IMAGE_TAG }} -t ${{ secrets.DOCKERHUB_USERNAME }}/result:latest ./multi-stack-application/result
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/worker:${{ env.IMAGE_TAG }} -t ${{ secrets.DOCKERHUB_USERNAME }}/worker:latest ./multi-stack-application/worker
       
       - name: Push Docker images
-        run: |
+        run: |        
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/vote:${{ env.IMAGE_TAG }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/vote:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/result:${{ env.IMAGE_TAG }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/result:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/worker:${{ env.IMAGE_TAG }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/worker:latest
 
       
