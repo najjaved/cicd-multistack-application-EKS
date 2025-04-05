@@ -31,7 +31,7 @@ spec:
           - name: PG_DATABASE
             value: "votes"
           - name: PG_HOST
-            value: "postgres-service" 
+            value: "najpostgres-postgresql" 
           - name: PG_PORT
             value: "5432"
 ---

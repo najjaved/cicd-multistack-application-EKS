@@ -21,7 +21,7 @@ spec:
           - name: REDIS_HOST
             value: "redis-service"
           - name: DB_HOST
-            value: "postgres-service"
+            value: "najpostgres-postgresql"
           - name: DB_USERNAME
             valueFrom:
               secretKeyRef:
