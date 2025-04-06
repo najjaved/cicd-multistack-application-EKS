@@ -1,12 +1,12 @@
 ---
-name: CD Pipeline
+name: CD Pipeline new
 # Provisions an EKS cluster and deploys (or updates) the Kubernetes manifests on EKS automatically.
 
 run-name: ${{ github.actor }} is Deploying 🚀
 on:
   workflow_run:
     workflows:
-      - CI Pipeline
+      - CI Pipeline new
     types:
       - completed
 

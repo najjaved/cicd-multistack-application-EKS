@@ -1,5 +1,5 @@
 ---
-name: CI Pipeline
+name: CI Pipeline new
 # Builds Docker images for each microservice & pushes them to Docker Hub
 on:
   push:
