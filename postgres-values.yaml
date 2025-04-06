@@ -1,0 +1,18 @@
+# these values will overried the parameters specified inside the Helm chart
+
+auth:
+  postgresPassword: admin123
+  database: votes
+
+persistence:
+  enabled: true
+  size: 8Gi
+  subPath: psql
+  storageClass: gp2
+
+service:
+  # Expose the service for PostgreSQL, setting the `clusterIP` for internal communication
+  enabled: true
+  type: ClusterIP
+  port: 5432
+

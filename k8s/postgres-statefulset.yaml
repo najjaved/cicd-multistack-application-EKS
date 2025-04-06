@@ -1,10 +1,10 @@
-# This configuration deploys a single PostgreSQL Pod, uses a PersistentVolumeClaim for data storage, and exposes PostgreSQL via a ClusterIP Service at port 5432
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: postgres-deployment
+  name: postgres-statefulset
 spec:
-  replicas: 1
+  serviceName: "postgres-service"  
+  replicas: 2
   selector:
     matchLabels:
       app: postgres
@@ -35,22 +35,17 @@ spec:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
           subPath: postgres
-      volumes:
-      - name: postgres-storage
-        persistentVolumeClaim:
-          claimName: postgres-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: postgres-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
-  storageClassName: gp2 # Kubernetes dynamically provisions an EBS-backed volume
+   # VolumeClaimTemplates allow Kubernetes to dynamically provision persistent storage for the StatefulSet
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: gp2 # Kubernetes dynamically provisions an EBS-backed volume
+      resources:
+        requests:
+          storage: 3Gi
+    
 ---
 apiVersion: v1
 kind: Service
@@ -63,4 +58,4 @@ spec:
     - protocol: TCP
       port: 5432
       targetPort: 5432
-  type: ClusterIP
+  clusterIP: None # headless service

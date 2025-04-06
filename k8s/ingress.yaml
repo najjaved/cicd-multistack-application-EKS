@@ -3,10 +3,17 @@ kind: Ingress
 metadata:
   name: vote-app-ingress
   annotations:
-    kubernetes.io/ingress.class: "nginx" 
+    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
+  ingressClassName:  "nginx"
+  # Cert-Manager creates a Certificate resource in the background automatically
+  tls:
+  - hosts:
+    - ae85708f7385a482f87e6b81b33b798e-1170678055.ca-west-1.elb.amazonaws.com # replace with proper domain name because ELB domain names are not supported for issuing SSL certificates
+    secretName: vote-tls  # cert will be stored here 
   rules:
-    - http:
+    - host: ae85708f7385a482f87e6b81b33b798e-1170678055.ca-west-1.elb.amazonaws.com
+      http:
         paths:
           - path: /vote
             pathType: Prefix
