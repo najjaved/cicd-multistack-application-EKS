@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: postgres-statefulset
 spec:
-  serviceName: "postgres-service"
+  serviceName: "postgres-service"  
   replicas: 2
   selector:
     matchLabels:
@@ -35,12 +35,13 @@ spec:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
           subPath: postgres
+   # VolumeClaimTemplates allow Kubernetes to dynamically provision persistent storage for the StatefulSet
   volumeClaimTemplates:
   - metadata:
       name: postgres-storage
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: gp2
+      storageClassName: gp2 # Kubernetes dynamically provisions an EBS-backed volume
       resources:
         requests:
           storage: 3Gi
