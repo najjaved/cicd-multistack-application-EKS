@@ -63,7 +63,7 @@ jobs:
           aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.AWS_CLUSTER }}
       
       - name: install helm
-        uses: Helm/setup-helm@v3
+        uses: Helm/setup-helm@v2
         with:
           version: v3.17.2
 
