@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -26,18 +25,15 @@ spec:
       - name: redis-storage
         persistentVolumeClaim:
           claimName: redis-pvc
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: redis-pvc
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 3Gi
-  storageClassName: gp2 # Kubernetes dynamically provisions an EBS-backed volume
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: gp2
+      resources:
+        requests:
+          storage: 1Gi
 
 ---
 apiVersion: v1
