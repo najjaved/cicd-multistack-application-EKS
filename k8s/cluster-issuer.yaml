@@ -1,0 +1,16 @@
+
+# Cert-Manager will automatically obtain an SSL/TLS certificate from Let's Encrypt
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging # letsencrypt-prod for real production like certificates
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory # URL of the certificate authority. Use https://acme-v02.api.letsencrypt.org/directory (for real/production certs)
+    email: najma.javed@outlook.com
+    privateKeySecretRef:
+      name: letsencrypt-staging-key
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
