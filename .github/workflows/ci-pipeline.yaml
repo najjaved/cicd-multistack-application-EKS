@@ -4,7 +4,7 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - main
+      - helm
     tags:
       - '*'
   workflow_dispatch: # allow manual triggering
