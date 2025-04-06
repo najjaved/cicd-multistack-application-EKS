@@ -4,14 +4,14 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - cicd
+      - main
     tags:
       - '*'
   workflow_dispatch: # allow manual triggering
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
     env:
       IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }} # use environment variables to pick between push events and tag push  events
     steps:
