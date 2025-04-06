@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+  annotations:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: worker
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+      - name: worker-container
+        image: "{{ .Values.image.worker.repository }}:{{ .Values.image.worker.tag }}"
+        ports:
+          - containerPort: 80
+        env:
+          - name: REDIS_HOST
+            value: "{{ .Values.redisHost }}"
+          - name: DB_HOST
+            value: "{{ .Values.postgresHost }}"
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.postgresSecret }}
+                key: postgres-username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.postgresSecret }}
+                key: postgres-password
+          - name: DB_NAME
+            value: "{{ .Values.postgresDB }}"
+          - name: DB_PORT
+            value: "{{ .Values.postgresPort }}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.service.worker.name }}    
+  annotations:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: worker
+    meta.helm.sh/release-name: microservices-release
+    meta.helm.sh/release-namespace: default
+spec:
+  selector:
+    app: worker
+  ports:
+    - port: {{ .Values.service.worker.port }}
+      targetPort: 80
+  type: ClusterIP

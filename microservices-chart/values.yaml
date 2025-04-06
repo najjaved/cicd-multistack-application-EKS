@@ -1,0 +1,37 @@
+replicaCount: 2
+
+image:
+  result:
+    repository: najjaved/result
+    tag: latest
+  worker:
+    repository: najjaved/worker
+    tag: latest
+  vote:
+    repository: najjaved/vote
+    tag: latest
+
+redisHost: "redis-service"
+postgresHost: "postgres-service"
+postgresPort: "5432"
+postgresDB: "votes"
+postgresSecret: "postgres-secret"
+
+service:
+  vote:
+    name: "vote-service"
+    port: 80
+  worker:
+    name: "worker-service"
+    port: 80
+  result:
+    name: "result-service"
+    port: 80
+
+
+autoscaling:
+  enabled: false # Or true, if you want to enable autoscaling
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
