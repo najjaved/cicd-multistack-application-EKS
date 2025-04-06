@@ -1,0 +1,86 @@
+---
+name: CI/CD Pipeline
+# CI: Builds Docker images for each microservice & pushes them to Docker Hub.
+# CD: Provisions an EKS cluster and deploys (or updates) the Kubernetes manifests on EKS automatically.
+
+run-name: ${{ github.actor }} is Building & Deploying 🚀
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  workflow_dispatch: # allow manual triggering
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest 
+    env:
+      IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }} # use environment variables to pick between push events and tag push  events
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build Docker images
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/vote:${{ env.IMAGE_TAG }} -t ${{ secrets.DOCKERHUB_USERNAME }}/vote:latest ./multi-stack-application/vote
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/result:${{ env.IMAGE_TAG }} -t ${{ secrets.DOCKERHUB_USERNAME }}/result:latest ./multi-stack-application/result
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/worker:${{ env.IMAGE_TAG }} -t ${{ secrets.DOCKERHUB_USERNAME }}/worker:latest ./multi-stack-application/worker
+      
+      - name: Push Docker images
+        run: |        
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/vote:${{ env.IMAGE_TAG }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/vote:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/result:${{ env.IMAGE_TAG }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/result:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/worker:${{ env.IMAGE_TAG }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/worker:latest
+      
+       # Deploy steps:
+            # 0. clone repository into the Github runner
+            # 1. configure aws cli
+            # 2. install kubectl
+            # 3. install helm
+            # 4. deploy kubernetes statefulsets for redis and postgres and other resources
+            # 5. deploy vote, worker and result microservices via Helm charts to EKS
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+        
+
+      - name: Install kubectl & update kubeconfig for EKS 
+        run: |
+          curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.32.0/2024-12-20/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.AWS_CLUSTER }}
+      
+      - name: install helm
+        uses: Helm/setup-helm@v3
+        with:
+          version: v3.17.2
+
+      - name: Generate the final deployment templates
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext-base
+
+
+      - name: Deploy redis, postgres and ingress to EKS
+        run: |
+          kubectl apply -f k8s/
+
+      - name: Deploy microservices to EKS using helm
+        run: |
+          helm upgrade --install microservices-release ./microservices-chart --debug \
+            --namespace default
+          
+
+      
