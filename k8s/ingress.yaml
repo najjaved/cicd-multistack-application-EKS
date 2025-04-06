@@ -9,7 +9,7 @@ spec:
   # Cert-Manager creates a Certificate resource in the background automatically
   tls:
   - hosts:
-    - ae85708f7385a482f87e6b81b33b798e-1170678055.ca-west-1.elb.amazonaws.com
+    - ae85708f7385a482f87e6b81b33b798e-1170678055.ca-west-1.elb.amazonaws.com # replace with proper domain name because ELB domain names are not supported for issuing SSL certificates
     secretName: vote-tls  # cert will be stored here 
   rules:
     - host: ae85708f7385a482f87e6b81b33b798e-1170678055.ca-west-1.elb.amazonaws.com
