@@ -51,6 +51,5 @@ jobs:
         
         - name: Deploy all microservices to EKS using helm
           run: |
-            helm upgrade --install microservices-release ./microservices-chart --debug\
-              -f values.yaml \
+            helm upgrade --install microservices-release ./microservices-chart --debug \
               --atomic --wait --timeout 5m
