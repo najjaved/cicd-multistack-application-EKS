@@ -48,35 +48,9 @@ jobs:
         - name: Deploy redis, postgres and ingress to EKS
           run: |
             kubectl apply -f k8s/
-
-        - name: Deploy microservices to EKS using helm
-          run: |
-            helm upgrade --install microservices-release ./microservices-chart --debug \
-              --namespace default
         
-        - name: Deploy Microservice Vote
+        - name: Deploy all microservices to EKS using helm
           run: |
-            helm upgrade --install vote ./microservices-chart \
+            helm upgrade --install microservices-release ./microservices-chart --debug\
               -f values.yaml \
-              --set microserviceVote.enabled=true \
-              --set microserviceWorker.enabled=false \
-              --set microserviceResult.enabled=false \
-              --atomic --wait --timeout 5m
-
-        - name: Deploy Microservice Worker
-          run: |
-            helm upgrade --install worker ./microservices-chart \
-              -f values.yaml \
-              --set microserviceVote.enabled=false \
-              --set microserviceWorker.enabled=true \
-              --set microserviceResult.enabled=false \
-              --atomic --wait --timeout 5m
-
-        - name: Deploy Microservice Result
-          run: |
-            helm upgrade --install result ./microservices-chart \
-              -f values.yaml \
-              --set microserviceVote.enabled=false \
-              --set microserviceWorker.enabled=false \
-              --set microserviceResult.enabled=true \
               --atomic --wait --timeout 5m
