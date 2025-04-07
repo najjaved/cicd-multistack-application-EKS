@@ -1,37 +1,90 @@
 replicaCount: 2
-
-image:
-  result:
-    repository: najjaved/result
-    tag: latest
-  worker:
-    repository: najjaved/worker
-    tag: latest
-  vote:
-    repository: najjaved/vote
-    tag: latest
-
+serviceType: ClusterIP
 redisHost: "redis-service"
 postgresHost: "postgres-service"
 postgresPort: "5432"
 postgresDB: "votes"
 postgresSecret: "postgres-secret"
 
-service:
-  vote:
-    name: "vote-service"
-    port: 80
-  worker:
-    name: "worker-service"
-    port: 80
-  result:
-    name: "result-service"
-    port: 80
 
+# Microservice Vote
+microserviceVote:
+  enabled: false
+  appName: "vote"
+  image:
+    repository: najjaved/vote
+    tag: latest
+  serviceName: "vote-service"
+  containerPort: 80 # targetPort 
+  servicePort: 80
+  env:
+    - name: REDIS_HOST
+      value: "{{ .Values.redisHost }}"
+    - name: REDIS_PORT
+      value: "6379"
+
+# Microservice Worker
+microserviceWorker:
+  enabled: false
+  appName: "worker"
+  image:
+    repository: najjaved/worker
+    tag: latest
+  serviceName: "worker-service"
+  containerPort: 80
+  servicePort: 80
+  env:
+    - name: REDIS_HOST
+      value: "{{ .Values.redisHost }}"
+    - name: DB_HOST
+      value: "{{ .Values.postgresHost }}"
+    - name: DB_NAME
+      value: "{{ .Values.postgresDB }}"
+    - name: DB_PORT
+      value: "{{ .Values.postgresPort }}"
+    - name: DB_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: "{{ .Values.postgresSecret }}"
+          key: "postgres-username"
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: "{{ .Values.postgresSecret }}"
+          key: "postgres-password"
+  
+
+# Microservice Result
+microserviceResult:
+  enabled: false
+  appName: "result"
+  replicaCount: 3  # override default
+  image:
+    repository: najjaved/result
+    tag: latest
+  serviceName: "result-service"
+  containerPort: 80
+  servicePort: 80
+  env:
+    - name: PG_DATABASE
+      value: "{{ .Values.postgresDB }}"
+    - name: PG_HOST
+      value: "{{ .Values.postgresHost }}"
+    - name: PG_PORT
+      value: "{{ .Values.postgresPort }}"
+    - name: PG_USER
+      valueFrom:
+        secretKeyRef:
+          name: "{{ .Values.postgresSecret }}"
+          key: "postgres-username"
+    - name: PG_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: "{{ .Values.postgresSecret }}"
+          key: "postgres-password"
 
 autoscaling:
   enabled: false # Or true, if you want to enable autoscaling
   minReplicas: 1
   maxReplicas: 5
   targetCPUUtilizationPercentage: 80
-

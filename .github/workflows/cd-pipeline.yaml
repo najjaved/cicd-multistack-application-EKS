@@ -45,12 +45,6 @@ jobs:
           with:
             version: v3.17.2
 
-        - name: Generate the final deployment templates
-          run: |
-            sudo apt-get update
-            sudo apt-get install -y gettext-base
-
-
         - name: Deploy redis, postgres and ingress to EKS
           run: |
             kubectl apply -f k8s/
@@ -59,4 +53,30 @@ jobs:
           run: |
             helm upgrade --install microservices-release ./microservices-chart --debug \
               --namespace default
+        
+        # --atomic  # Auto-rollback on failure
+        # --wait    # Wait for deployment completion
+        - name: Deploy Microservice Vote
+          run: |
+            helm upgrade --install vote ./microservices-chart -f values.yaml \
+              --set microserviceVote.enabled=true \
+              --set microserviceWorker.enabled=false \
+              --set microserviceResult.enabled=false \ 
+              --atomic --wait --timeout 5m
+
+        - name: Deploy Microservice Worker
+          run: |
+            helm upgrade --install worker ./microservices-chart -f values.yaml \
+              --set microserviceVote.enabled=false \
+              --set microserviceWorker.enabled=true \
+              --set microserviceResult.enabled=false \ 
+              --atomic --wait --timeout 5m
+
+        - name: Deploy Microservice Result
+          run: |
+            helm upgrade --install result ./microservices-chart -f values.yaml \
+              --set microserviceVote.enabled=false \
+              --set microserviceWorker.enabled=false \
+              --set microserviceResult.enabled=true \ 
+              --atomic --wait --timeout 5m
           

@@ -1,0 +1,18 @@
+# Install Vote service
+helm install vote ./microservices-chart \
+  -f values.yaml \
+  --set microserviceVote.enabled=true \
+
+# Install Worker service
+helm install worker ./microservices-chart \
+  -f values.yaml \
+  --set microserviceWorker.enabled=true \
+
+# Install Result service
+helm install result ./microservices-chart \
+  -f values.yaml \
+  --set microserviceResult.enabled=true \
+  --set replicaCount=3
+
+		  
+        
