@@ -54,27 +54,29 @@ jobs:
             helm upgrade --install microservices-release ./microservices-chart --debug \
               --namespace default
         
-        # --atomic  # Auto-rollback on failure
-        # --wait    # Wait for deployment completion
         - name: Deploy Microservice Vote
-          run: helm upgrade --install vote ./microservices-chart \
-                -f values.yaml \
-                --set microserviceVote.enabled=true \
-                --set microserviceWorker.enabled=false \
-                --set microserviceResult.enabled=false \
-                --atomic --wait --timeout 5m
+          run: |
+            helm upgrade --install vote ./microservices-chart \
+              -f values.yaml \
+              --set microserviceVote.enabled=true \
+              --set microserviceWorker.enabled=false \
+              --set microserviceResult.enabled=false \
+              --atomic --wait --timeout 5m
 
         - name: Deploy Microservice Worker
-          run: helm upgrade --install worker ./microservices-chart -f values.yaml \
-                --set microserviceVote.enabled=false \
-                --set microserviceWorker.enabled=true \
-                --set microserviceResult.enabled=false \ 
-                --atomic --wait --timeout 5m
+          run: |
+            helm upgrade --install worker ./microservices-chart \
+              -f values.yaml \
+              --set microserviceVote.enabled=false \
+              --set microserviceWorker.enabled=true \
+              --set microserviceResult.enabled=false \
+              --atomic --wait --timeout 5m
 
         - name: Deploy Microservice Result
-          run: helm upgrade --install result ./microservices-chart -f values.yaml \
-                --set microserviceVote.enabled=false \
-                --set microserviceWorker.enabled=false \
-                --set microserviceResult.enabled=true \ 
-                --atomic --wait --timeout 5m
-         
+          run: |
+            helm upgrade --install result ./microservices-chart \
+              -f values.yaml \
+              --set microserviceVote.enabled=false \
+              --set microserviceWorker.enabled=false \
+              --set microserviceResult.enabled=true \
+              --atomic --wait --timeout 5m
