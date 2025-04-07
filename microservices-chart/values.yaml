@@ -5,6 +5,7 @@ postgresHost: "postgres-service"
 postgresPort: "5432"
 postgresDB: "votes"
 postgresSecret: "postgres-secret"
+servicePort: 80
 
 
 # Microservice Vote
