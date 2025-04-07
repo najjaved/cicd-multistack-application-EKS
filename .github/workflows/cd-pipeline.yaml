@@ -24,6 +24,8 @@ jobs:
             # 5. deploy vote, worker and result microservices via Helm charts to EKS
         - name: Checkout repository
           uses: actions/checkout@v4
+          with:
+            fetch-depth: 0  # Ensures all files are downloaded
 
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v4
@@ -51,5 +53,8 @@ jobs:
         
         - name: Deploy all microservices to EKS using helm
           run: |
-            helm upgrade --install microservices-release ./microservices-chart --debug \
-              --atomic --wait --timeout 5m
+            helm upgrade --install microservices-release ./microservices-chart \
+              -f ./microservices-chart/values.yaml \
+              --debug \
+              --atomic \
+              --wait

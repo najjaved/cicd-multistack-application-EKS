@@ -1,18 +1,30 @@
 # Install Vote service
 helm install vote ./microservices-chart \
-  -f values.yaml \
+  -f ./microservices-chart/values.yaml \
   --set microserviceVote.enabled=true \
 
 # Install Worker service
 helm install worker ./microservices-chart \
-  -f values.yaml \
+  -f ./microservices-chart/values.yaml \
   --set microserviceWorker.enabled=true \
 
 # Install Result service
 helm install result ./microservices-chart \
-  -f values.yaml \
+  -f ./microservices-chart/values.yaml \
   --set microserviceResult.enabled=true \
   --set replicaCount=3
 
-		  
-        
+****************************
+helm uninstall microservices-release
+helm upgrade --install microservices-release ./microservices-chart --debug \
+  -f ./microservices-chart/values.yaml 
+
+Verify:
+kubectl get pods
+kubectl get svc
+helm status microservices-release
+
+helm install microservices-release --values values.yaml ./microservices-chart --debug 
+
+
+helm template microservices-release ./microservices-chart --debug
