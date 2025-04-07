@@ -10,7 +10,7 @@ servicePort: 80
 
 # Microservice Vote
 microserviceVote:
-  enabled: false
+  enabled: true
   appName: "vote"
   image:
     repository: najjaved/vote
@@ -26,7 +26,7 @@ microserviceVote:
 
 # Microservice Worker
 microserviceWorker:
-  enabled: false
+  enabled: true
   appName: "worker"
   image:
     repository: najjaved/worker
@@ -57,7 +57,7 @@ microserviceWorker:
 
 # Microservice Result
 microserviceResult:
-  enabled: false
+  enabled: true
   appName: "result"
   replicaCount: 3  # override default
   image:
