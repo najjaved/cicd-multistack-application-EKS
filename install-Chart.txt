@@ -1,30 +1,36 @@
-# Install Vote service
-helm install vote ./microservices-chart \
-  -f ./microservices-chart/values.yaml \
-  --set microserviceVote.enabled=true \
+Verify template rendering before deploying:
+helm template ./microservices-chart --debug
 
-# Install Worker service
-helm install worker ./microservices-chart \
+helm upgrade --install voting-app ./microservices-chart \
   -f ./microservices-chart/values.yaml \
-  --set microserviceWorker.enabled=true \
+  --atomic --wait --timeout 5m
 
-# Install Result service
-helm install result ./microservices-chart \
-  -f ./microservices-chart/values.yaml \
-  --set microserviceResult.enabled=true \
-  --set replicaCount=3
 
-****************************
+kubectl get pods
+kubectl get svc
+
+
+# Check all resources
+kubectl get all -l app.kubernetes.io/instance=voting-app
+
+# View Helm releases
+helm list
+
+# Check release status
+helm status voting-app
+************************************************************
 helm uninstall microservices-release
 helm upgrade --install microservices-release ./microservices-chart --debug \
   -f ./microservices-chart/values.yaml 
 
 Verify:
+kubectl get all -l app.kubernetes.io/instance=microservices-release
 kubectl get pods
 kubectl get svc
+
+Troubleshootinng:
+helm template ./microservices-chart --debug
+helm get manifest microservices-release | kubectl get -f -
 helm status microservices-release
+kubectl get events --sort-by='.metadata.creationTimestamp'
 
-helm install microservices-release --values values.yaml ./microservices-chart --debug 
-
-
-helm template microservices-release ./microservices-chart --debug

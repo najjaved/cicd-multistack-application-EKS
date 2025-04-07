@@ -1,19 +1,21 @@
-{{- if .Values.enabled }}
+{{- range $name, $config := .Values.microservices }}
+{{- if $config.enabled }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.serviceName }}
-  annotations:
+  name: {{ $config.serviceName }}
+  labels:
+    app.kubernetes.io/name: {{ $config.appName }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: {{ .Values.appName }}
-    meta.helm.sh/release-name: {{ .Release.Name }}
-    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
 spec:
   selector:
-    app: {{ .Values.appName }}
+    app: {{ $config.appName }}
   ports:
     - protocol: TCP
-      port: {{ .Values.servicePort }}
-      targetPort: {{ .Values.containerPort }}
-  type: {{ .Values.serviceType }}
+      port: {{ $config.servicePort }}
+      targetPort: {{ $config.containerPort }}
+  type: {{ $.Values.global.serviceType }}
+{{- end }}
 {{- end }}
