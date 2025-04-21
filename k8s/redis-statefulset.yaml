@@ -21,10 +21,6 @@ spec:
         volumeMounts:
         - name: redis-storage
           mountPath: /data
-      volumes:
-      - name: redis-storage
-        persistentVolumeClaim:
-          claimName: redis-pvc
   volumeClaimTemplates:
   - metadata:
       name: redis-storage
