@@ -1,88 +1,86 @@
-replicaCount: 2
-serviceType: ClusterIP
-redisHost: "redis-service"
-postgresHost: "postgres-service"
-postgresPort: "5432"
-postgresDB: "votes"
-postgresSecret: "postgres-secret"
-servicePort: 80
-
-
-# Microservice Vote
-microserviceVote:
-  enabled: true
-  appName: "vote"
-  image:
-    repository: najjaved/vote
-    tag: latest
-  serviceName: "vote-service"
-  containerPort: 80 # targetPort 
+global:
+  replicaCount: 2
+  serviceType: ClusterIP
+  redisHost: "redis-service"
+  postgresHost: "postgres-service"
+  postgresPort: "5432"
+  postgresDB: "votes"
+  postgresSecret: "postgres-secret"
   servicePort: 80
-  env:
-    - name: REDIS_HOST
-      value: "{{ .Values.redisHost }}"
-    - name: REDIS_PORT
-      value: "6379"
 
-# Microservice Worker
-microserviceWorker:
-  enabled: true
-  appName: "worker"
-  image:
-    repository: najjaved/worker
-    tag: latest
-  serviceName: "worker-service"
-  containerPort: 80
-  servicePort: 80
-  env:
-    - name: REDIS_HOST
-      value: "{{ .Values.redisHost }}"
-    - name: DB_HOST
-      value: "{{ .Values.postgresHost }}"
-    - name: DB_NAME
-      value: "{{ .Values.postgresDB }}"
-    - name: DB_PORT
-      value: "{{ .Values.postgresPort }}"
-    - name: DB_USERNAME
-      valueFrom:
-        secretKeyRef:
-          name: "{{ .Values.postgresSecret }}"
-          key: "postgres-username"
-    - name: DB_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: "{{ .Values.postgresSecret }}"
-          key: "postgres-password"
-  
 
-# Microservice Result
-microserviceResult:
-  enabled: true
-  appName: "result"
-  replicaCount: 3  # override default
-  image:
-    repository: najjaved/result
-    tag: latest
-  serviceName: "result-service"
-  containerPort: 80
-  servicePort: 80
-  env:
-    - name: PG_DATABASE
-      value: "{{ .Values.postgresDB }}"
-    - name: PG_HOST
-      value: "{{ .Values.postgresHost }}"
-    - name: PG_PORT
-      value: "{{ .Values.postgresPort }}"
-    - name: PG_USER
-      valueFrom:
-        secretKeyRef:
-          name: "{{ .Values.postgresSecret }}"
-          key: "postgres-username"
-    - name: PG_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: "{{ .Values.postgresSecret }}"
-          key: "postgres-password"
+microservices:
+  vote:
+    enabled: true
+    appName: "vote"
+    image:
+      repository: najjaved/vote
+      tag: latest
+    serviceName: "vote-service"
+    containerPort: 80 # targetPort 
+    servicePort: 80
+    env:
+      - name: REDIS_HOST
+        value: "redis-service"  # Direct value, no templating
+      - name: REDIS_PORT
+        value: "6379"
+
+  worker:
+    enabled: true
+    appName: "worker"
+    replicaCount: 3  # Override global
+    image:
+      repository: najjaved/worker
+      tag: latest
+    serviceName: "worker-service"
+    containerPort: 80
+    servicePort: 80
+    env:
+      - name: REDIS_HOST
+        value: "redis-service"
+      - name: DB_HOST
+        value: "postgres-service"
+      - name: DB_NAME
+        value: "votes"
+      - name: DB_PORT
+        value: "5432"
+      - name: DB_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: "postgres-secret"
+            key: "postgres-username"
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: "postgres-secret"
+            key: "postgres-password"
+
+  result:
+    enabled: true
+    appName: "result"
+    image:
+      repository: najjaved/result
+      tag: latest
+    serviceName: "result-service"
+    containerPort: 80
+    servicePort: 80
+    env:
+      - name: PG_DATABASE
+        value: "votes"
+      - name: PG_HOST
+        value: "postgres-service"
+      - name: PG_PORT
+        value: "5432"
+      - name: PG_USER
+        valueFrom:
+          secretKeyRef:
+            name: "postgres-secret"
+            key: "postgres-username"
+      - name: PG_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: "postgres-secret"
+            key: "postgres-password"
 
 autoscaling:
   enabled: false # Or true, if you want to enable autoscaling

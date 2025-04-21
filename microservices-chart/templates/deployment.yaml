@@ -1,28 +1,33 @@
-{{- if .Values.enabled }}
+# loop through microservices
+
+{{- range $name, $config := .Values.microservices }}
+{{- if $config.enabled }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.appName }}-deployment
-  annotations:
+  name: {{ $config.appName }}-deployment
+  labels:
+    app.kubernetes.io/name: {{ $config.appName }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
     app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: {{ .Values.appName }}
 spec:
-  replicas: {{ .Values.replicaCount | default .Values.global.replicaCount }}
+  replicas: {{ $config.replicaCount | default $.Values.global.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.appName }}
+      app: {{ $config.appName }}
   template:
     metadata:
       labels:
-        app: {{ .Values.appName }}
+        app: {{ $config.appName }}
     spec:
       containers:
-      - name: {{ .Values.appName }}-container
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      - name: {{ $config.appName }}
+        image: "{{ $config.image.repository }}:{{ $config.image.tag }}"
         ports:
-          - containerPort: {{ .Values.containerPort }}
+          - containerPort: {{ $config.containerPort }}
         env:
-        {{- range .Values.env }}
+        {{- range $config.env }}
         - name: {{ .name }}
           {{- if .value }}
           value: {{ .value | quote }}
@@ -31,4 +36,5 @@ spec:
             {{- toYaml .valueFrom | nindent 12 }}
           {{- end }}
         {{- end }}
+{{- end }}
 {{- end }}

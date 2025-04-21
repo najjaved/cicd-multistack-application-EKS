@@ -53,8 +53,14 @@ jobs:
         
         - name: Deploy all microservices to EKS using helm
           run: |
-            helm upgrade --install microservices-release ./microservices-chart \
+            helm uninstall voting-app-release
+            helm upgrade --install voting-app-release ./microservices-chart \
               -f ./microservices-chart/values.yaml \
               --debug \
-              --atomic \
-              --wait
+              --atomic --wait --timeout 10m
+
+        - name: Verify Helm deployment
+          run: |
+            kubectl get all -l app.kubernetes.io/instance=voting-app-release
+            helm list
+            helm status voting-app-release

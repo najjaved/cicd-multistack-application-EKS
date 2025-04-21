@@ -1,0 +1,36 @@
+Verify template rendering before deploying:
+helm template ./microservices-chart --debug
+
+helm upgrade --install voting-app ./microservices-chart \
+  -f ./microservices-chart/values.yaml \
+  --atomic --wait --timeout 5m
+
+
+kubectl get pods
+kubectl get svc
+
+
+# Check all resources
+kubectl get all -l app.kubernetes.io/instance=voting-app
+
+# View Helm releases
+helm list
+
+# Check release status
+helm status voting-app
+************************************************************
+helm uninstall microservices-release
+helm upgrade --install microservices-release ./microservices-chart --debug \
+  -f ./microservices-chart/values.yaml 
+
+Verify:
+kubectl get all -l app.kubernetes.io/instance=microservices-release
+kubectl get pods
+kubectl get svc
+
+Troubleshootinng:
+helm template ./microservices-chart --debug
+helm get manifest microservices-release | kubectl get -f -
+helm status microservices-release
+kubectl get events --sort-by='.metadata.creationTimestamp'
+
