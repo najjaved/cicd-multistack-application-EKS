@@ -73,7 +73,7 @@ jobs:
 
       - name: Deploy microservices to EKS using helm
         run: |
-          helm upgrade --install microservices-release ./microservices-chart --debug
+          helm upgrade --install voting-app-release ./microservices-chart --debug
           
 
       
